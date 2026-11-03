@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import classnames from 'classnames';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import type {ReactNode} from 'react';
 import {FormattedMessage} from 'react-intl';
@@ -12,16 +11,11 @@ import type {Post} from '@mattermost/types/posts';
 import {Posts} from 'mattermost-redux/constants/index';
 import {isPostEphemeral} from 'mattermost-redux/utils/post_utils';
 
-import ActionsMenu from 'components/actions_menu';
 import CommentIcon from 'components/common/comment_icon';
 import DotMenu from 'components/dot_menu';
-import PostFlagIcon from 'components/post_view/post_flag_icon';
-import PostReaction from 'components/post_view/post_reaction';
-import PostRecentReactions from 'components/post_view/post_recent_reactions';
 
-import PluggableErrorBoundary from 'plugins/pluggable/error_boundary';
-import {Locations, Constants} from 'utils/constants';
-import {isSystemMessage, fromAutoResponder} from 'utils/post_utils';
+import {Locations} from 'utils/constants';
+import {isSystemMessage} from 'utils/post_utils';
 
 import type {PostActionComponent} from 'types/store/plugins';
 
@@ -65,8 +59,6 @@ type Props = {
 const PostOptions = (props: Props): JSX.Element => {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [showDotMenu, setShowDotMenu] = useState(false);
-    const [showActionsMenu, setShowActionsMenu] = useState(false);
-    const [showPluginMenu, setShowPluginMenu] = useState(false);
 
     const toggleEmojiPicker = useCallback((show: boolean) => {
         setShowEmojiPicker(show);
@@ -99,13 +91,10 @@ const PostOptions = (props: Props): JSX.Element => {
         collapsedThreadsEnabled,
         isReadOnly,
         post,
-        oneClickReactionsEnabled,
-        isMobileView,
     } = props;
 
     const isEphemeral = isPostEphemeral(post);
     const systemMessage = isSystemMessage(post);
-    const isFromAutoResponder = fromAutoResponder(post);
 
     function removePost() {
         props.removePost(props.post);
@@ -116,125 +105,7 @@ const PostOptions = (props: Props): JSX.Element => {
         props.handleDropdownOpened!(open);
     };
 
-    const handleActionsMenuOpened = (open: boolean) => {
-        setShowActionsMenu(open);
-        props.handleDropdownOpened!(open);
-    };
-
-    const handlePluginMenuOpened = (open: boolean) => {
-        setShowPluginMenu(open);
-        props.handleDropdownOpened!(open);
-    };
-
     const isPostDeleted = post && post.state === Posts.POST_DELETED;
-    const hoverLocal = props.hover || showEmojiPicker || showDotMenu || showActionsMenu || showPluginMenu;
-    const isBurnOnReadPost = props.isBurnOnReadPost || false;
-    const showCommentIcon = !isBurnOnReadPost && (isFromAutoResponder || (!systemMessage && (isMobileView ||
-            hoverLocal || (!post.root_id && Boolean(props.hasReplies)) ||
-            props.isFirstReply) && props.location === Locations.CENTER));
-    const commentIconExtraClass = isMobileView ? '' : 'pull-right';
-
-    let commentIcon;
-    if (showCommentIcon) {
-        commentIcon = (
-            <li>
-                <CommentIcon
-                    handleCommentClick={props.handleCommentClick}
-                    postId={post.id}
-                    extraClass={commentIconExtraClass}
-                    commentCount={props.collapsedThreadsEnabled ? 0 : props.replyCount}
-                />
-            </li>
-        );
-    }
-
-    // Don't show reactions for unrevealed BoR posts - users can't react to concealed content
-    const showRecentlyUsedReactions = (!isMobileView && !isReadOnly && !isEphemeral && !post.failed && !systemMessage && !channelIsArchived && oneClickReactionsEnabled && props.enableEmojiPicker && hoverLocal && !props.shouldDisplayBurnOnReadConcealed);
-
-    let showRecentReactions: ReactNode;
-    if (showRecentlyUsedReactions) {
-        const showMoreReactions = props.isExpanded ||
-            props.location === 'CENTER' ||
-            (document.getElementById('sidebar-right')?.getBoundingClientRect().width ?? 0) > Constants.SIDEBAR_MINIMUM_WIDTH;
-
-        showRecentReactions = (
-            <PostRecentReactions
-                channelId={post.channel_id}
-                postId={post.id}
-                teamId={props.teamId}
-                emojis={props.recentEmojis}
-                size={showMoreReactions ? 3 : 1}
-            />
-        );
-    }
-
-    // Don't show emoji picker button for unrevealed BoR posts
-    const showReactionIcon = !systemMessage && !isReadOnly && !isEphemeral && !post.failed && props.enableEmojiPicker && !channelIsArchived && !props.shouldDisplayBurnOnReadConcealed;
-    let postReaction;
-    if (showReactionIcon) {
-        postReaction = (
-            <li>
-                <PostReaction
-                    channelId={post.channel_id}
-                    location={props.location}
-                    postId={post.id}
-                    teamId={props.teamId}
-                    showEmojiPicker={showEmojiPicker}
-                    setShowEmojiPicker={toggleEmojiPicker}
-                />
-            </li>
-        );
-    }
-
-    // Don't show save button for unrevealed BoR posts
-    let flagIcon: ReactNode = null;
-    if (!isMobileView && (!isEphemeral && !post.failed && !systemMessage) && !props.shouldDisplayBurnOnReadConcealed) {
-        flagIcon = (
-            <li>
-                <PostFlagIcon
-                    location={props.location}
-                    postId={post.id}
-                    isFlagged={props.isFlagged}
-                />
-            </li>
-        );
-    }
-
-    // Action menus
-    const showActionsMenuIcon = props.shouldShowActionsMenu && (isMobileView || hoverLocal);
-    const actionsMenu = showActionsMenuIcon && (
-        <li>
-            <ActionsMenu
-                post={post}
-                location={props.location}
-                handleDropdownOpened={handleActionsMenuOpened}
-                isMenuOpen={showActionsMenu}
-            />
-        </li>
-    );
-
-    let pluginItems: ReactNode = null;
-
-    if ((!isEphemeral && !post.failed && !systemMessage && !isBurnOnReadPost) && hoverLocal) {
-        pluginItems = props.pluginActions?.
-            map((item) => {
-                if (item.component) {
-                    const Component = item.component;
-                    return (
-                        <li key={item.id}>
-                            <PluggableErrorBoundary pluginId={item.pluginId}>
-                                <Component
-                                    post={props.post}
-                                    handleDropdownOpened={handlePluginMenuOpened}
-                                />
-                            </PluggableErrorBoundary>
-                        </li>
-                    );
-                }
-                return null;
-            }) || [];
-    }
-
     const dotMenu = (
         <li>
             <DotMenu
@@ -276,7 +147,6 @@ const PostOptions = (props: Props): JSX.Element => {
                 data-testid={`post-menu-${props.post.id}`}
             >
                 {dotMenu}
-                {flagIcon}
                 {props.canReply && !hasCRTFooter &&
                 <li>
                     <CommentIcon
@@ -307,16 +177,9 @@ const PostOptions = (props: Props): JSX.Element => {
         options = (
             <ul
                 data-testid={`post-menu-${props.post.id}`}
-                className={classnames('col post-menu', {'post-menu--position': !hoverLocal && showCommentIcon})}
+                className='col post-menu'
             >
-                {!collapsedThreadsEnabled && !showRecentlyUsedReactions && dotMenu}
-                {showRecentReactions}
-                {postReaction}
-                {flagIcon}
-                {pluginItems}
-                {actionsMenu}
-                {commentIcon}
-                {(collapsedThreadsEnabled || showRecentlyUsedReactions) && dotMenu}
+                {dotMenu}
             </ul>
         );
     }
