@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import React from 'react';
 
 import ProfilePopover from 'components/profile_popover';
-import StatusIcon from 'components/status_icon';
-import StatusIconNew from 'components/status_icon_new';
 import Avatar, {getAvatarWidth} from 'components/widgets/users/avatar';
 import type {TAvatarSizeToken} from 'components/widgets/users/avatar';
 
@@ -36,7 +34,7 @@ function ProfilePicture(props: Props) {
 
     const profileIconClass = `profile-icon ${props.isEmoji ? 'emoji' : ''}`;
 
-    const hideStatus = props.isBot || props.fromAutoResponder || props.fromWebhook;
+    const hideStatus = true;
 
     if (props.userId) {
         return (
@@ -68,7 +66,6 @@ function ProfilePicture(props: Props) {
                             url={props.src}
                         />
                     </span>
-                    <StatusIcon status={props.status}/>
                 </>
             </ProfilePopover>
         );
@@ -87,14 +84,6 @@ function ProfilePicture(props: Props) {
                     url={props.src}
                 />
             </span>
-            {props.newStatusIcon ? (
-                <StatusIconNew
-                    className={props.statusClass}
-                    status={props.status}
-                />
-            ) : (
-                <StatusIcon status={props.status}/>
-            )}
         </span>
     );
 }

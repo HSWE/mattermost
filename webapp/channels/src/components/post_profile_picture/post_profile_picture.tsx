@@ -44,14 +44,6 @@ export default class PostProfilePicture extends React.PureComponent<Props> {
         return '';
     };
 
-    getStatus = (fromAutoResponder: boolean, fromWebhook: boolean, user: UserProfile): string | undefined => {
-        if (fromAutoResponder || fromWebhook || (user && user.is_bot)) {
-            return '';
-        }
-
-        return this.props.status;
-    };
-
     getPostIconURL = (defaultURL: string, fromAutoResponder: boolean, fromWebhook: boolean): string => {
         const {enablePostIconOverride, hasImageProxy, post} = this.props;
         const postProps = post.props;
@@ -75,7 +67,6 @@ export default class PostProfilePicture extends React.PureComponent<Props> {
 
     render() {
         const {
-            availabilityStatusOnPosts,
             compactDisplay,
             post,
             user,
@@ -96,7 +87,6 @@ export default class PostProfilePicture extends React.PureComponent<Props> {
         const overrideIconEmoji = ensureString(post.props.override_icon_emoji);
         const overwriteName = ensureString(post.props?.override_username);
         const isEmoji = overrideIconEmoji !== '';
-        const status = this.getStatus(fromAutoResponder, fromWebhook, user);
 
         return (
             <ProfilePicture
@@ -104,7 +94,7 @@ export default class PostProfilePicture extends React.PureComponent<Props> {
                 src={src}
                 profileSrc={profileSrc}
                 isEmoji={isEmoji}
-                status={availabilityStatusOnPosts === 'true' ? status : ''}
+                status=''
                 userId={user?.id}
                 channelId={post.channel_id}
                 username={user?.username}

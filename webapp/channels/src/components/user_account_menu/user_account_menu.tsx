@@ -44,12 +44,10 @@ export default function UserAccountMenu(props: Props) {
                     withCustomStatus: isCustomStatusSet,
                 }),
                 'aria-label': formatMessage({id: 'userAccountMenu.menuButton.ariaLabel', defaultMessage: 'User\'s account menu'}),
-                'aria-describedby': 'userAccountMenuButtonDescribedBy',
                 children: (
                     <UserAccountMenuButton
                         profilePicture={props.profilePicture}
                         openCustomStatusModal={openCustomStatusModal}
-                        status={props.status}
                     />
                 ),
             }}

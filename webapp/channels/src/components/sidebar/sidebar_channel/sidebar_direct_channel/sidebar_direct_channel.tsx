@@ -60,23 +60,12 @@ class SidebarDirectChannel extends React.PureComponent<Props> {
             );
         }
 
-        let className = '';
-        if (channel.status === 'online') {
-            className = 'status-online';
-        } else if (channel.status === 'away') {
-            className = 'status-away';
-        } else if (channel.status === 'dnd') {
-            className = 'status-dnd';
-        }
-
         return (
             <ProfilePicture
                 src={Client4.getProfilePictureUrl(teammate.id, teammate.last_picture_update)}
                 size={'xs'}
-                status={teammate.is_bot ? '' : channel.status}
+                status=''
                 wrapperClass='DirectChannel__profile-picture'
-                newStatusIcon={true}
-                statusClass={`DirectChannel__status-icon ${className}`}
             />
         );
     };
