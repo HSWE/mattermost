@@ -2010,6 +2010,15 @@
     direction: ltr;
 }
 
+[id^='postMessageText'],
+[id^='rhsPostMessageText'] {
+    .table-responsive {
+        thead {
+            display: none;
+        }
+    }
+}
+
 .file-attachment-menu-item-input {
     position: absolute;
     top: 0;
