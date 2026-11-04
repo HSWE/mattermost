@@ -231,6 +231,10 @@ const SidebarCategoryMenu = ({
         />
     ) : null;
 
+    if (category.type === CategoryTypes.CHANNELS) {
+        return null;
+    }
+
     return (
         <SidebarCategoryGenericMenu
             id={category.id}
