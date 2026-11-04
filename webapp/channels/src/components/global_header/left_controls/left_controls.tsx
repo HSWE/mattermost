@@ -10,7 +10,7 @@ import HistoryButtons from './history_buttons';
 import ProductMenu from './product_menu';
 
 const LeftControlsContainer = styled.div`
-    display: flex;
+    display: none;
     align-items: center;
     height: 40px;
     flex-shrink: 0;
