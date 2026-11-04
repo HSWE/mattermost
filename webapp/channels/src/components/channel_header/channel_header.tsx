@@ -11,7 +11,6 @@ import {WithTooltip} from '@mattermost/shared/components/tooltip';
 
 import CustomStatusEmoji from 'components/custom_status/custom_status_emoji';
 import CustomStatusText from 'components/custom_status/custom_status_text';
-import PopoutButton from 'components/popout_button';
 import Timestamp from 'components/timestamp';
 import Tag from 'components/widgets/tag/tag';
 
@@ -24,7 +23,7 @@ import {
     NotificationLevels,
     RHSStates,
 } from 'utils/constants';
-import {canPopout, getPopoutChannelTitle, isChannelPopoutWindow, popoutChannel} from 'utils/popouts/popout_windows';
+import {getPopoutChannelTitle, popoutChannel} from 'utils/popouts/popout_windows';
 import {isEmptyObject} from 'utils/utils';
 
 import ChannelHeaderText from './channel_header_text';
@@ -442,12 +441,6 @@ class ChannelHeader extends React.PureComponent<Props> {
                         channelMember={channelMember}
                     />
                     <CallButton/>
-                    {canPopout() && !isChannelPopoutWindow() && (
-                        <PopoutButton
-                            className='channel-header__icon'
-                            onClick={this.popoutChannelView}
-                        />
-                    )}
                     <ChannelInfoButton channel={channel}/>
                 </div>
             </div>
