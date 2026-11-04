@@ -4,27 +4,27 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {isDesktopApp} from '@mattermost/shared/utils/user_agent';
-
-import HistoryButtons from './history_buttons';
-import ProductMenu from './product_menu';
+import hsweLogo from '../../../../assets/hswe_logo.png';
 
 const LeftControlsContainer = styled.div`
-    display: none;
+    display: flex;
     align-items: center;
     height: 40px;
     flex-shrink: 0;
     flex-basis: 30%;
+`;
 
-    > * + * {
-        margin-left: 12px;
-    }
+const LogoImage = styled.img`
+    height: 34px;
+    margin-left: 16px;
 `;
 
 const LeftControls = (): JSX.Element => (
     <LeftControlsContainer>
-        <ProductMenu/>
-        {isDesktopApp() && <HistoryButtons/>}
+        <LogoImage
+            src={hsweLogo}
+            alt='HSWE'
+        />
     </LeftControlsContainer>
 );
 
