@@ -9,7 +9,8 @@ import type {UserProfile} from '@mattermost/types/users';
 import {ensureString} from 'mattermost-redux/utils/post_utils';
 
 import ProfilePicture from 'components/profile_picture';
-import MattermostLogo from 'components/widgets/icons/mattermost_logo';
+
+import hsweLogoIcon from '../../../assets/HSWE_logo_icon.png';
 
 import Constants, {UserStatuses} from 'utils/constants';
 import * as PostUtils from 'utils/post_utils';
@@ -86,7 +87,13 @@ export default class PostProfilePicture extends React.PureComponent<Props> {
         const fromWebhook = PostUtils.isFromWebhook(post);
 
         if (isSystemMessage && !compactDisplay && !fromWebhook && !isBot) {
-            return <MattermostLogo className='icon'/>;
+            return (
+                <img
+                    className='icon'
+                    src={hsweLogoIcon}
+                    alt=''
+                />
+            );
         }
         const fromAutoResponder = PostUtils.fromAutoResponder(post);
 
