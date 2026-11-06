@@ -5,8 +5,6 @@ import React from 'react';
 import {injectIntl} from 'react-intl';
 import type {WrappedComponentProps} from 'react-intl';
 
-import {isDesktopApp} from '@mattermost/shared/utils/user_agent';
-
 import {Permissions} from 'mattermost-redux/constants';
 
 import {emitUserLoggedOutEvent} from 'actions/global_actions';
@@ -30,7 +28,6 @@ import UserSettingsModal from 'components/user_settings/modal';
 import Menu from 'components/widgets/menu/menu';
 
 import {ModalIdentifiers, UserStatuses} from 'utils/constants';
-import {makeUrlSafe} from 'utils/url';
 
 import type {PropsFromRedux} from './index';
 
@@ -75,7 +72,6 @@ export class MobileSidebarRightItems extends React.PureComponent<Props> {
     render() {
         const {formatMessage} = this.props.intl;
 
-        const safeAppDownloadLink = makeUrlSafe(this.props.appDownloadLink || '');
         const teamsLimitReached = this.props.isStarterFree && !this.props.isFreeTrial && this.props.usageDeltaTeams >= 0;
 
         const pluginItems = this.props.pluginMenuItems.map((item) => (
@@ -403,18 +399,6 @@ export class MobileSidebarRightItems extends React.PureComponent<Props> {
                         icon={
                             <i
                                 className='icon icon-alert-outline'
-                                style={{color: 'var(--sidebar-text)'}}
-                            />
-                        }
-                    />
-                    <Menu.ItemExternalLink
-                        id='nativeAppLink'
-                        show={Boolean(this.props.appDownloadLink) && !isDesktopApp()}
-                        url={safeAppDownloadLink}
-                        text={formatMessage({id: 'navbar_dropdown.nativeApps', defaultMessage: 'Download Apps'})}
-                        icon={
-                            <i
-                                className='icon icon-cellphone'
                                 style={{color: 'var(--sidebar-text)'}}
                             />
                         }
