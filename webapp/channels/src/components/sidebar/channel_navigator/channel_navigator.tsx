@@ -15,8 +15,6 @@ import * as Utils from 'utils/utils';
 
 import type {ModalData} from 'types/actions';
 
-import ChannelFilter from '../channel_filter';
-
 export type Props = WrappedComponentProps & {
     showUnreadsCategory: boolean;
     isQuickSwitcherOpen: boolean;
@@ -88,7 +86,6 @@ class ChannelNavigator extends React.PureComponent<Props> {
     render() {
         return (
             <div className={'SidebarChannelNavigator webapp'}>
-                {!this.props.showUnreadsCategory && <ChannelFilter/>}
                 <button
                     className={'SidebarChannelNavigator_jumpToButton'}
                     onClick={this.openQuickSwitcher}
