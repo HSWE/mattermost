@@ -54,6 +54,8 @@ const ChannelHeaderTitleFavorite = () => {
         return null;
     }
 
+    return null;
+
     let ariaLabel = intl.formatMessage({id: 'channelHeader.addToFavorites', defaultMessage: 'Add to Favorites'});
     if (isFavorite) {
         ariaLabel = intl.formatMessage({id: 'channelHeader.removeFromFavorites', defaultMessage: 'Remove from Favorites'});
