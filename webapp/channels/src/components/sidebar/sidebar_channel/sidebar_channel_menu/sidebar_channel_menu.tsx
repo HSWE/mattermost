@@ -3,33 +3,20 @@
 
 import React, {useRef, memo} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
-import {useSelector} from 'react-redux';
 
 import {
-    MarkAsUnreadIcon,
-    StarIcon,
-    StarOutlineIcon,
-    BellOutlineIcon,
-    BellOffOutlineIcon,
     LinkVariantIcon,
     AccountPlusOutlineIcon,
     DotsVerticalIcon,
     ExitToAppIcon,
 } from '@mattermost/compass-icons/components';
-import {WithTooltip} from '@mattermost/shared/components/tooltip';
 
-import {isChannelInManagedCategory} from 'mattermost-redux/selectors/entities/channel_categories';
-
-import MenuItemOpenInNewWindow from 'components/channel_header_menu/menu_items/open_in_new_window';
 import ChannelInviteModal from 'components/channel_invite_modal';
 import ChannelMoveToSubmenu from 'components/channel_move_to_sub_menu';
 import * as Menu from 'components/menu';
 
 import Constants, {ModalIdentifiers} from 'utils/constants';
-import {canPopout, isChannelPopoutWindow} from 'utils/popouts/popout_windows';
 import {copyToClipboard} from 'utils/utils';
-
-import type {GlobalState} from 'types/store';
 
 import type {PropsFromRedux, OwnProps} from './index';
 
@@ -38,180 +25,15 @@ type Props = PropsFromRedux & OwnProps;
 const SidebarChannelMenu = ({
     channel,
     channelLink,
-    currentUserId,
-    favoriteChannel,
-    isFavorite,
-    isMuted,
-    isUnread,
     managePrivateChannelMembers,
     managePublicChannelMembers,
-    readMultipleChannels,
-    markMostRecentPostInChannelAsUnread,
-    muteChannel,
     onMenuToggle,
     openModal,
-    unfavoriteChannel,
-    unmuteChannel,
     channelLeaveHandler,
 }: Props) => {
     const isLeaving = useRef(false);
-    const isInManagedCategory = useSelector((state: GlobalState) => isChannelInManagedCategory(state, channel.id));
 
     const {formatMessage} = useIntl();
-
-    let markAsReadUnreadMenuItem: JSX.Element | null = null;
-    if (isUnread) {
-        function handleMarkAsRead() {
-            // We use mark multiple to not update the active channel in the server
-            readMultipleChannels([channel.id]);
-        }
-
-        markAsReadUnreadMenuItem = (
-            <Menu.Item
-                id={`markAsRead-${channel.id}`}
-                onClick={handleMarkAsRead}
-                leadingElement={<MarkAsUnreadIcon size={18}/>}
-                labels={(
-                    <FormattedMessage
-                        id='sidebar_left.sidebar_channel_menu.markAsRead'
-                        defaultMessage='Mark as Read'
-                    />
-                )}
-            />
-
-        );
-    } else {
-        function handleMarkAsUnread() {
-            markMostRecentPostInChannelAsUnread(channel.id);
-        }
-
-        markAsReadUnreadMenuItem = (
-            <Menu.Item
-                id={`markAsUnread-${channel.id}`}
-                onClick={handleMarkAsUnread}
-                leadingElement={<MarkAsUnreadIcon size={18}/>}
-                labels={(
-                    <FormattedMessage
-                        id='sidebar_left.sidebar_channel_menu.markAsUnread'
-                        defaultMessage='Mark as Unread'
-                    />
-                )}
-            />
-        );
-    }
-
-    let favoriteItem: JSX.Element;
-    if (isFavorite) {
-        function handleUnfavoriteChannel() {
-            unfavoriteChannel(channel.id);
-        }
-
-        favoriteItem = (
-            <Menu.Item
-                id={`unfavorite-${channel.id}`}
-                onClick={handleUnfavoriteChannel}
-                leadingElement={<StarIcon size={18}/>}
-                labels={(
-                    <FormattedMessage
-                        id='sidebar_left.sidebar_channel_menu.unfavoriteChannel'
-                        defaultMessage='Unfavorite'
-                    />
-                )}
-                disabled={isInManagedCategory}
-            />
-        );
-    } else {
-        function handleFavoriteChannel() {
-            favoriteChannel(channel.id);
-        }
-
-        favoriteItem = (
-            <Menu.Item
-                id={`favorite-${channel.id}`}
-                onClick={handleFavoriteChannel}
-                leadingElement={<StarOutlineIcon size={18}/>}
-                labels={(
-                    <FormattedMessage
-                        id='sidebar_left.sidebar_channel_menu.favoriteChannel'
-                        defaultMessage='Favorite'
-                    />
-                )}
-                disabled={isInManagedCategory}
-            />
-        );
-    }
-
-    const favoriteUnfavoriteMenuItem = isInManagedCategory ? (
-        <WithTooltip
-            title={
-                <FormattedMessage
-                    id='channelHeader.managedCategoryFavoriteDisabled'
-                    defaultMessage='Channels in managed categories cannot be favorited.'
-                />
-            }
-        >
-            <div>{favoriteItem}</div>
-        </WithTooltip>
-    ) : favoriteItem;
-
-    let muteUnmuteChannelMenuItem: JSX.Element | null = null;
-    if (isMuted) {
-        let muteChannelText = (
-            <FormattedMessage
-                id='sidebar_left.sidebar_channel_menu.unmuteChannel'
-                defaultMessage='Unmute Channel'
-            />
-        );
-        if (channel.type === Constants.DM_CHANNEL || channel.type === Constants.GM_CHANNEL) {
-            muteChannelText = (
-                <FormattedMessage
-                    id='sidebar_left.sidebar_channel_menu.unmute'
-                    defaultMessage='Unmute'
-                />
-            );
-        }
-
-        function handleUnmuteChannel() {
-            unmuteChannel(currentUserId, channel.id);
-        }
-
-        muteUnmuteChannelMenuItem = (
-            <Menu.Item
-                id={`unmute-${channel.id}`}
-                onClick={handleUnmuteChannel}
-                leadingElement={<BellOffOutlineIcon size={18}/>}
-                labels={muteChannelText}
-            />
-        );
-    } else {
-        let muteChannelText = (
-            <FormattedMessage
-                id='sidebar_left.sidebar_channel_menu.muteChannel'
-                defaultMessage='Mute Channel'
-            />
-        );
-        if (channel.type === Constants.DM_CHANNEL || channel.type === Constants.GM_CHANNEL) {
-            muteChannelText = (
-                <FormattedMessage
-                    id='sidebar_left.sidebar_channel_menu.mute'
-                    defaultMessage='Mute'
-                />
-            );
-        }
-
-        function handleMuteChannel() {
-            muteChannel(currentUserId, channel.id);
-        }
-
-        muteUnmuteChannelMenuItem = (
-            <Menu.Item
-                id={`mute-${channel.id}`}
-                onClick={handleMuteChannel}
-                leadingElement={<BellOutlineIcon size={18}/>}
-                labels={muteChannelText}
-            />
-        );
-    }
 
     let copyLinkMenuItem: JSX.Element | null = null;
     if (channel.type === Constants.OPEN_CHANNEL || channel.type === Constants.PRIVATE_CHANNEL) {
@@ -321,13 +143,6 @@ const SidebarChannelMenu = ({
                 onToggle: onMenuToggle,
             }}
         >
-            {canPopout() && !isChannelPopoutWindow() && (
-                <MenuItemOpenInNewWindow channel={channel}/>
-            )}
-            {markAsReadUnreadMenuItem}
-            {favoriteUnfavoriteMenuItem}
-            {muteUnmuteChannelMenuItem}
-            <Menu.Separator/>
             <ChannelMoveToSubmenu channel={channel}/>
             {(copyLinkMenuItem || addMembersMenuItem) && <Menu.Separator/>}
             {copyLinkMenuItem}
